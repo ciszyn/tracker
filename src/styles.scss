@@ -1,1 +1,22 @@
 /* You can add global styles to this file, and also import other style files */
+*,
+*::after,
+*::before {
+    margin: 0;
+    padding: 0;
+    box-sizing: inherit;
+}
+
+
+html {
+    // This defines what 1rem is
+    font-size: 62.5%; //1 rem = 10px; 10px/16px = 62.5%
+    background-color: #222;
+
+}
+
+body {
+    box-sizing: border-box;
+    overflow-x: hidden;
+    color: #eee;
+}
