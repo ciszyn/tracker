@@ -37,7 +37,7 @@
     </div>
   </div>
 
-  <div *ngFor="let activity of activities; index as i" class="activity-list">
+  <div *ngFor="let activity of activities; index as i" class="activity-list" [ngClass]="{'started-activity': i === activeActivity }">
     <div class="activity-header">
       <input [(ngModel)]="activity.name" class="activity-input input-large" type="text" placeholder="New Activity" (change)="updateActivities()"/>
 
