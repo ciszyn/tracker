@@ -1,6 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, HostListener, OnDestroy } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-import { timer } from 'rxjs';
+import { Observable, timer } from 'rxjs';
+import { ComponentCanDeactivate } from './guards/can-deactivate';
 import { Activity } from './models/activity';
 import { SavedActivity } from './models/saved-activity';
 import { TrackerService } from './services/tracker-service.service';
@@ -12,14 +13,15 @@ const counter = timer(0, 1000);
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements ComponentCanDeactivate {
   public activities: SavedActivity[] = [];
   public newActivity: SavedActivity = new SavedActivity("", []);
   public time: number = 0;
   public totalPieChart: any | null = null;
-  public weekPieChart: any | null = null;
+  public monthPieChart: any | null = null;
   public meanPieChart: any | null = null;
   public colors: string[] = []
+  public activeActivity: number | null = null;
 
   constructor(private trackerService: TrackerService) {
     Chart.register(...registerables)
@@ -28,7 +30,7 @@ export class AppComponent {
       this.activities = a ?? []
 
       this.createPieChart("total")
-      this.createPieChart("week")
+      this.createPieChart("month")
       this.createPieChart("mean")
     })
 
@@ -37,33 +39,54 @@ export class AppComponent {
     for (var i = 0; i < 16; i++) {
       this.colors.push(this.getRandomColor())
     }
+
+    addEventListener('beforeunload', (event) => { confirm("confirm") });
+  }
+
+  @HostListener('window:beforeunload', ['$event'])
+  canDeactivate(event: any): Observable<boolean> | boolean {
+    confirm("confirm")
+
+    if (this.activeActivity != null) {
+      event.preventDefault();
+      event.returnValue = '';
+      return false;
+    }
+
+    return true;
   }
 
   public createNewActivity() {
-    console.log("posting");
     this.activities.push(this.newActivity);
     this.trackerService.setActivities(this.activities);
     this.newActivity = new SavedActivity("", []);
   }
 
   public updateActivities() {
-    console.log("updating")
     this.trackerService.setActivities(this.activities);
   }
 
-  public startActivity(activity: SavedActivity) {
-    console.log("starting")
+  public startActivity(activity: SavedActivity, i: number) {
+    console.log(i)
+    console.log(this.activeActivity)
+
     if (activity.activities)
       activity.activities.push(new Activity(new Date(), null))
     else
       activity.activities = [new Activity(new Date(), null)]
+
+    if (this.activeActivity != null) {
+      var activeActivity = this.activities[this.activeActivity]
+      activeActivity.activities[activeActivity.activities.length - 1].end = new Date()
+    }
+
+    this.activeActivity = i;
     this.trackerService.setActivities(this.activities)
-    console.log(this.activities)
   }
 
   public stopActivity(activity: SavedActivity) {
-    console.log("stopping")
     activity.activities[activity.activities.length - 1].end = new Date()
+    this.activeActivity = null;
     this.trackerService.setActivities(this.activities)
   }
 
@@ -94,7 +117,18 @@ export class AppComponent {
     if (!activity.activities)
       return 0;
     activity.activities.forEach(a => {
-      if ((new Date().getTime() - 7 * 60 * 60 * 1000) < new Date(a.start).getTime())
+      if ((new Date().getTime() - 7 * 24 * 60 * 60 * 1000) < new Date(a.start).getTime())
+        result += this.getDuration(a)
+    })
+    return result
+  }
+
+  public getLastMonthDuration(activity: SavedActivity) {
+    var result = 0
+    if (!activity.activities)
+      return 0;
+    activity.activities.forEach(a => {
+      if ((new Date().getTime() - 30 * 7 * 24 * 60 * 60 * 1000) < new Date(a.start).getTime())
         result += this.getDuration(a)
     })
     return result
@@ -106,7 +140,7 @@ export class AppComponent {
     if (!activity.activities)
       return 0;
     activity.activities.forEach(a => {
-      if ((new Date().getTime() - 7 * 60 * 60 * 1000) < new Date(a.start).getTime())
+      if ((new Date().getTime() - 7 * 24 * 60 * 60 * 1000) < new Date(a.start).getTime())
         result += this.getDuration(a)
         count += 1
     })
@@ -143,7 +177,7 @@ export class AppComponent {
   }
 
   private getRandomColor() {
-    var color = ''; // <-----------
+    var color = '';
     var letters = '0123456789ABCDEF';
 
     color += letters[Math.floor(Math.random() * 10 + 2)];
@@ -153,6 +187,7 @@ export class AppComponent {
   }
 
   public createPieChart(type: string) {
+
     var durations: number[] = []
     var backgroundColors: string[] = []
     var labels: string[] = []
@@ -160,8 +195,8 @@ export class AppComponent {
     this.activities.forEach((a, i) => {
       if (type == "total")
         durations.push(this.getTotalDuration(a))
-      if (type == "week")
-        durations.push(this.getLastWeekDuration(a))
+      if (type == "month")
+        durations.push(this.getLastMonthDuration(a))
       if (type == "mean")
         durations.push(this.getMeanDuration(a))
 
@@ -174,15 +209,14 @@ export class AppComponent {
       labels: labels,
       datasets: [{
         data: durations,
-        backgroundColor: backgroundColors
       }]
     };
 
     if (type == "total") {
       this.totalPieChart?.destroy();
     }
-    if (type == "week") {
-      this.weekPieChart?.destroy();
+    if (type == "month") {
+      this.monthPieChart?.destroy();
     }
     if (type == "mean") {
       this.meanPieChart?.destroy();
@@ -199,7 +233,15 @@ export class AppComponent {
             callbacks: {
               label: (value) => this.secondsToTimeString(parseFloat(value.parsed.toString()))
             }
-          }
+          },
+          legend: {
+            labels: {
+              color: "#bbb",
+              font: {
+                size: 15
+              }
+            }
+          },
         }
       }
     });
@@ -207,8 +249,8 @@ export class AppComponent {
     if (type == "total") {
       this.totalPieChart = chart
     }
-    if (type == "week") {
-      this.weekPieChart = chart
+    if (type == "month") {
+      this.monthPieChart = chart
     }
     if (type == "mean") {
       this.meanPieChart = chart

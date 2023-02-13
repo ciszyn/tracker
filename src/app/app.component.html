@@ -1,5 +1,19 @@
 <div class="main-content">
 
+  <div class="activity" *ngIf="activeActivity == null">
+    No activity is currently started
+  </div>
+
+  <div class="activity started-activity" *ngIf="activeActivity != null">
+    <div class="activity-input">
+      {{activities[activeActivity].name}}
+    </div>
+
+    <div>
+      {{secondsToTimeString(getLastDuration(activities[activeActivity]))}}
+    </div>
+  </div>
+
   <div class="charts">
     <div class="chart-content">
       <div class="chart-title">Total Time</div>
@@ -9,9 +23,9 @@
     </div>
 
     <div class="chart-content">
-      <div class="chart-title">Weekly Time</div>
+      <div class="chart-title">Monthly Time</div>
       <div class="chart-container">
-        <canvas id="week-pie-chart"></canvas>
+        <canvas id="month-pie-chart"></canvas>
       </div>
     </div>
 
@@ -23,11 +37,11 @@
     </div>
   </div>
 
-  <div *ngFor="let activity of activities" class="activity-list">
+  <div *ngFor="let activity of activities; index as i" class="activity-list">
     <div class="activity-header">
       <input [(ngModel)]="activity.name" class="activity-input input-large" type="text" placeholder="New Activity" (change)="updateActivities()"/>
 
-      <button *ngIf="!isStarted(activity)" class="button" (click)="startActivity(activity)">Start</button>
+      <button *ngIf="!isStarted(activity)" class="button" (click)="startActivity(activity, i)">Start</button>
       <button *ngIf="isStarted(activity)" class="button" (click)="stopActivity(activity)">Stop</button>
     </div>
     <div class="activity-detail">
@@ -42,10 +56,10 @@
 
       <div class="cell">
         <div class="label">
-          Last Week
+          Last Month
         </div>
         <div class="value">
-          {{secondsToTimeString(getLastWeekDuration(activity))}}
+          {{secondsToTimeString(getLastMonthDuration(activity))}}
         </div>
       </div>
 

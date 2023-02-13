@@ -10,6 +10,7 @@ import { environment } from 'src/environment/environment';
 import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { FormsModule } from '@angular/forms';
+import { PendingChangesGuard } from './guards/can-deactivate';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,7 @@ import { FormsModule } from '@angular/forms';
     provideFirebaseApp(() => initializeApp(environment.firebase)),
     provideDatabase(() => getDatabase()),
   ],
-  providers: [],
+  providers: [PendingChangesGuard],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
