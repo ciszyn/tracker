@@ -1,6 +1,6 @@
 import {writeFileSync} from 'fs';
 
-const targetPath = './src/environments/environment.prod.ts';
+const targetPath = './src/environment/environment.prod.ts';
 
 const envConfigFile = `export const environment = {
   firebase: {
