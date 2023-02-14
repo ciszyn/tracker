@@ -6,7 +6,8 @@
     "start": "ng serve",
     "build": "npm run config && ng build --configuration production",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "config": "ts-node -O '{\"module\": \"commonjs\"}' ./src/config.index.ts"
   },
   "private": true,
   "dependencies": {
