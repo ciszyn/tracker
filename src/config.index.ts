@@ -12,7 +12,7 @@ const envConfigFile = `export const environment = {
     storageBucket: 'pong-b7547.appspot.com',
     messagingSenderId: '${process.env['FIREBASE_SENDER_ID']}',
     appId: '${process.env['FIREBASE_APP_ID']}',
-  }
+  },
   production: true,
 };
 `;
