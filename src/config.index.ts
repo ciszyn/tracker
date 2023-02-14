@@ -17,4 +17,6 @@ const envConfigFile = `export const environment = {
 };
 `;
 
+process.stdout.write(envConfigFile);
+
 writeFileSync(targetPath, envConfigFile, 'utf8');
