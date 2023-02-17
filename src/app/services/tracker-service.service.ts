@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList, AngularFireObject } from '@angular/fire/compat/database';
-import { Observable } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
+import { AuthService } from '../guards/auth.service';
 import { SavedActivity } from '../models/saved-activity';
 
 @Injectable({
@@ -10,17 +11,18 @@ export class TrackerService {
 
   private dbPath = "/tracker"
 
-  activityRef: AngularFireObject<SavedActivity[]>;
+  activityRef: Observable<AngularFireObject<SavedActivity[]>>;
 
-  constructor(private db: AngularFireDatabase) {
-    this.activityRef = db.object(this.dbPath);
+  constructor(private db: AngularFireDatabase, private auth: AuthService) {
+    this.activityRef = this.auth.user$.pipe(map(user => db.object(user?.uid + this.dbPath)))
   }
 
   public getActivities(): Observable<SavedActivity[] | null> {
-    return this.activityRef.valueChanges();
+    return this.activityRef.pipe(switchMap(ref => ref.valueChanges()));
   }
 
   public setActivities(activities: SavedActivity[]): any {
-    this.activityRef.update(activities);
+    while(!this.activityRef);
+    this.activityRef.subscribe(ref => ref.update(activities));
   }
 }

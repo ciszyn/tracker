@@ -26,7 +26,7 @@ export class AppComponent implements ComponentCanDeactivate {
   constructor(private trackerService: TrackerService) {
     Chart.register(...registerables)
 
-    trackerService.getActivities().subscribe(a => {
+    trackerService.getActivities()?.subscribe(a => {
       this.activities = a ?? []
 
       this.createPieChart("total")
@@ -67,7 +67,6 @@ export class AppComponent implements ComponentCanDeactivate {
   }
 
   public startActivity(activity: SavedActivity, i: number) {
-    console.log(i)
     console.log(this.activeActivity)
 
     if (activity.activities)
