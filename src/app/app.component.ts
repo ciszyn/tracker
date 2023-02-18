@@ -22,6 +22,7 @@ export class AppComponent implements ComponentCanDeactivate {
   public meanPieChart: any | null = null;
   public colors: string[] = []
   public activeActivity: number | null = null;
+  public selectedMenu: number = -1;
 
   constructor(private trackerService: TrackerService) {
     Chart.register(...registerables)
@@ -29,10 +30,17 @@ export class AppComponent implements ComponentCanDeactivate {
     trackerService.getActivities()?.subscribe(a => {
       this.activities = a ?? []
 
+      this.activities.forEach((activity, index) => {
+        if (this.isStarted(activity)) {
+          this.activeActivity = index;
+        }
+      })
+
       this.createPieChart("total")
       this.createPieChart("month")
       this.createPieChart("mean")
     })
+
 
     counter.subscribe(t => this.time += 0);
 
@@ -86,6 +94,32 @@ export class AppComponent implements ComponentCanDeactivate {
   public stopActivity(activity: SavedActivity) {
     activity.activities[activity.activities.length - 1].end = new Date()
     this.activeActivity = null;
+    this.trackerService.setActivities(this.activities)
+  }
+
+  public toggleActivity(activity: SavedActivity, i: number) {
+    if (this.isStarted(activity)) {
+      this.stopActivity(activity)
+    }
+    else {
+      this.startActivity(activity, i)
+    }
+  }
+
+  public deleteActivity(activity: SavedActivity, i: number) {
+    this.activities.splice(i, 1);
+    console.log(this.activities);
+    this.trackerService.deleteActivity(this.activities);
+    this.selectedMenu = -1;
+  }
+
+  public clearActivity(activity: SavedActivity) {
+    activity.activities = []
+    this.trackerService.setActivities(this.activities)
+  }
+
+  public undoActivity(activity: SavedActivity) {
+    activity.activities.pop()
     this.trackerService.setActivities(this.activities)
   }
 
@@ -253,6 +287,16 @@ export class AppComponent implements ComponentCanDeactivate {
     }
     if (type == "mean") {
       this.meanPieChart = chart
+    }
+  }
+
+  public selectMenu(i: number) {
+    console.log(i)
+    if (this.selectedMenu === i) {
+      this.selectedMenu = -1
+    }
+    else {
+      this.selectedMenu = i;
     }
   }
 }

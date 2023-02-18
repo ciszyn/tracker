@@ -22,7 +22,11 @@ export class TrackerService {
   }
 
   public setActivities(activities: SavedActivity[]): any {
-    while(!this.activityRef);
-    this.activityRef.subscribe(ref => ref.update(activities));
+    this.activityRef.subscribe(ref => ref.update(activities))
+  }
+
+  public deleteActivity(activities: SavedActivity[]) {
+    // this.activityRef.subscribe(ref => ref.update(activities))
+    this.activityRef.subscribe(ref => ref.set(activities))
   }
 }
