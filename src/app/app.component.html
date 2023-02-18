@@ -6,13 +6,13 @@
     </div>
   </div>
 
-  <div class="activity started-activity activity-overview" *ngIf="activeActivity != null" (click)="stopActivity(activities[activeActivity])">
+  <div class="activity started-activity activity-overview" *ngIf="activeActivity != null" (click)="stopActivity(activeActivity)">
     <div class="activity-input">
-      {{activities[activeActivity].name}}
+      {{activeActivity.name}}
     </div>
 
     <div class="activity-duration">
-      {{secondsToTimeString(getLastDuration(activities[activeActivity]))}}
+      {{secondsToTimeString(getLastDuration(activeActivity))}}
     </div>
   </div>
 
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <div *ngFor="let activity of activities; index as i" class="activity-list" [ngClass]="{'started-activity': i === activeActivity }" (click)="toggleActivity(activity, i)">
+  <div *ngFor="let activity of activities; index as i" class="activity-list" [ngClass]="{'started-activity': activity == activeActivity}" (click)="toggleActivity(activity, i)">
     <div class="activity-header">
       <input (click)="$event.preventDefault(); $event.stopPropagation();" [(ngModel)]="activity.name" class="activity-input input-large" type="text" placeholder="New Activity" (change)="updateActivities()"/>
 

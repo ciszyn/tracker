@@ -21,7 +21,7 @@ export class AppComponent implements ComponentCanDeactivate {
   public monthPieChart: any | null = null;
   public meanPieChart: any | null = null;
   public colors: string[] = []
-  public activeActivity: number | null = null;
+  public activeActivity: SavedActivity | null = null;
   public selectedMenu: number = -1;
 
   constructor(private trackerService: TrackerService) {
@@ -32,7 +32,7 @@ export class AppComponent implements ComponentCanDeactivate {
 
       this.activities.forEach((activity, index) => {
         if (this.isStarted(activity)) {
-          this.activeActivity = index;
+          this.activeActivity = activity;
         }
       })
 
@@ -83,11 +83,10 @@ export class AppComponent implements ComponentCanDeactivate {
       activity.activities = [new Activity(new Date(), null)]
 
     if (this.activeActivity != null) {
-      var activeActivity = this.activities[this.activeActivity]
-      activeActivity.activities[activeActivity.activities.length - 1].end = new Date()
+      this.activeActivity.activities[this.activeActivity.activities.length - 1].end = new Date()
     }
 
-    this.activeActivity = i;
+    this.activeActivity = activity;
     this.trackerService.setActivities(this.activities)
   }
 
@@ -108,8 +107,12 @@ export class AppComponent implements ComponentCanDeactivate {
 
   public deleteActivity(activity: SavedActivity, i: number) {
     this.activities.splice(i, 1);
-    console.log(this.activities);
     this.trackerService.deleteActivity(this.activities);
+
+    if (this.activeActivity == activity) {
+      this.activeActivity = null;
+    }
+
     this.selectedMenu = -1;
   }
 
