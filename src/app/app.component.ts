@@ -1,4 +1,4 @@
-import { Component, HostListener, OnDestroy } from '@angular/core';
+import { Component, HostListener, OnDestroy, TemplateRef } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { Observable, timer } from 'rxjs';
 import { ComponentCanDeactivate } from './guards/can-deactivate';
@@ -23,6 +23,7 @@ export class AppComponent implements ComponentCanDeactivate {
   public colors: string[] = []
   public activeActivity: SavedActivity | null = null;
   public selectedMenu: number = -1;
+  public openedDialog: number = -1;
 
   constructor(private trackerService: TrackerService) {
     Chart.register(...registerables)
@@ -114,6 +115,7 @@ export class AppComponent implements ComponentCanDeactivate {
     }
 
     this.selectedMenu = -1;
+    this.openedDialog= -1;
   }
 
   public clearActivity(activity: SavedActivity) {
@@ -297,9 +299,23 @@ export class AppComponent implements ComponentCanDeactivate {
     console.log(i)
     if (this.selectedMenu === i) {
       this.selectedMenu = -1
+      this.openedDialog = -1;
     }
     else {
       this.selectedMenu = i;
     }
+  }
+
+  public openDialog(i: number) {
+    this.openedDialog = i;
+  }
+
+  public hideDialog() {
+    this.openedDialog = -1;
+  }
+
+  public hideMenu() {
+    this.selectedMenu = -1;
+    this.openedDialog = -1;
   }
 }

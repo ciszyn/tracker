@@ -39,22 +39,71 @@
     </div>
   </div>
 
-  <div *ngFor="let activity of activities; index as i" class="activity-list" [ngClass]="{'started-activity': activity == activeActivity}" (click)="toggleActivity(activity, i)">
+  <div *ngFor="let activity of activities; index as i" class="activity-list" [ngClass]="{'started-activity': activity == activeActivity}">
     <div class="activity-header">
-      <input (click)="$event.preventDefault(); $event.stopPropagation();" [(ngModel)]="activity.name" class="activity-input input-large" type="text" placeholder="New Activity" (change)="updateActivities()"/>
+      <input [(ngModel)]="activity.name" class="activity-input input-large" type="text" placeholder="New Activity" (change)="updateActivities()"/>
 
-      <div class="menu-button" (click)="$event.preventDefault(); $event.stopPropagation(); selectMenu(i)">
-        <div class="menu-icon"></div>
+      <div class="menu">
+        <div class="menu-button" (click)="selectMenu(i)">
+          <div class="menu-icon"></div>
+        </div>
 
         <div class="options" *ngIf="selectedMenu==i">
-          <div class="option" (click)="deleteActivity(activity, i)">
+          <div class="option" *ngIf="!isStarted(activity)" (click)="startActivity(activity, i); hideMenu()">
+            Start
+          </div>
+          <div class="option" *ngIf="isStarted(activity)" (click)="stopActivity(activity); hideMenu()">
+            Stop
+          </div>
+          <div class="option" (click)="openDialog(0)">
             Delete
           </div>
-          <div class="option" (click)="clearActivity(activity)">
+
+          <div class="dialog-background" *ngIf="openedDialog === 0" (click)="hideDialog()">
+            <div class="dialog" *ngIf="openedDialog === 0">
+              <h2 class="dialog-title">Delete Activity</h2>
+              <div class="dialog-description">
+                <p>This action is non-reversible. Are You sure that You want to delete activity <b>{{activity.name}}</b>?</p>
+              </div>
+              <div class="dialog-buttons">
+                <button class="dialog-button" (click)="deleteActivity(activity, i); hideMenu()">Yes</button>
+                <button class="dialog-button" (click)="hideMenu()">No</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="option" (click)="openDialog(1)">
             Clear
           </div>
-          <div class="option" (click)="undoActivity(activity)">
+
+          <div class="dialog-background" *ngIf="openedDialog === 1" (click)="hideDialog()">
+            <div class="dialog">
+              <h2 class="dialog-title">Clear Data</h2>
+              <div class="dialog-description">
+                <p>This action is non-reversible. Are You sure that You want to clear data of activity <b>{{activity.name}}</b>?</p>
+              </div>
+              <div class="dialog-buttons">
+                <button class="dialog-button" (click)="clearActivity(activity); hideMenu()">Yes</button>
+                <button class="dialog-button" (click)="hideMenu()">No</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="option" (click)="openDialog(2)">
             Undo
+          </div>
+
+          <div class="dialog-background" *ngIf="openedDialog === 2" (click)="hideDialog()">
+            <div class="dialog">
+              <h2 class="dialog-title">Undo</h2>
+              <div class="dialog-description">
+                <p>This action is non-reversible. Are You sure that You want to undo last activity of <b>{{activity.name}}</b>?</p>
+              </div>
+              <div class="dialog-buttons">
+                <button class="dialog-button" (click)="undoActivity(activity); hideMenu()">Yes</button>
+                <button class="dialog-button" (click)="hideMenu()">No</button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

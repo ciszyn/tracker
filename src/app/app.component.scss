@@ -40,15 +40,6 @@
   @media only screen and (max-width: 30em) {
     padding: 1rem 2rem;
   }
-
-  &:hover {
-    cursor: pointer;
-    background-color: #232;
-  }
-
-  &:has(> .activity-header:hover) {
-    background-color: #333;
-  }
 }
 
 .activity-header {
@@ -100,12 +91,16 @@
     outline: none !important;
   }
 
-  &:hover {
-    border-color: #eee;
-  }
-
   @media only screen and (max-width: 30em) {
     font-size: 3rem;
+  }
+}
+
+.activity-overview {
+  cursor: pointer;
+
+  &:hover {
+    background-color: #078307b6;
   }
 }
 
@@ -173,26 +168,13 @@
 
 .started-activity {
   background-color: #078307;
-
-  &:hover {
-    background-color: #078307b6
-  }
-
-  &:has(> .activity-header:hover) {
-    background-color: #078307;
-  }
 }
 
-.activity-overview {
-  cursor: pointer;
-
-  &:hover {
-    background-color: #078307b6;
-  }
+.menu {
+  position: relative;
 }
 
 .menu-button {
-  position: relative;
   display: flex;
   align-content: center;
   justify-content: center;
@@ -210,21 +192,16 @@
       cursor: pointer;
       transform: scale(1.2)
   }
-
-  // &:hover .options {
-  //   visibility: visible;
-  // }
-
-  // .options {
-  //   visibility: hidden;
-  // }
 }
 
 .options {
   position: absolute;
   top: 4rem;
-  width: 10rem;
   border-radius: .5rem;
+
+  @media only screen and (max-width: 50em) {
+    right: 0;
+  }
 
   background-color: #282828;
   // visibility: hidden;
@@ -241,6 +218,7 @@
 
   &:hover {
     background-color: #222;
+    cursor: pointer;
   }
 }
 
@@ -275,5 +253,64 @@
 
   &::after {
       top: .9rem;
+  }
+}
+
+.dialog-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: #00000011;
+
+  &:hover {
+    cursor: default;
+  }
+}
+
+.dialog {
+  // position: fixed;
+  // top: 40vh;
+  // right: 40vh;
+  background-color: #444;
+  width: 30vw;
+  padding: 3rem;
+  border-radius: 1rem;
+
+  @media only screen and (max-width: 30em) {
+    width: 90vw;
+  }
+}
+
+.dialog-title {
+  margin-bottom: .5rem;
+}
+
+.dialog-buttons {
+  margin-top: 3rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.dialog-button {
+  background-color: #222;
+  font-size: 2rem;
+  border-style: none;
+  color: inherit;
+  padding: .5rem 1rem;
+  border-radius: .5rem;
+
+  &:hover {
+      // text-decoration: underline;
+      cursor: pointer;
+      background-color: #111;
+  }
+
+  &:not(:last-child) {
+    margin-right: 1rem;
   }
 }
