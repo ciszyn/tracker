@@ -6,12 +6,6 @@
     </div>
   </div>
 
-  <nav class="navigation">
-    <div class="nav-button" *ngFor="let activity of activities; index as i" (click)="toggleActivity(activity, i)" [ngClass]="{'nav-started': isStarted(activity)}">
-      {{activity.name}}
-    </div>
-  </nav>
-
   <div class="activity started-activity activity-overview" *ngIf="activeActivity != null" (click)="stopActivity(activeActivity)">
     <div class="activity-input">
       {{activeActivity.name}}
@@ -21,6 +15,12 @@
       {{secondsToTimeString(getLastDuration(activeActivity))}}
     </div>
   </div>
+
+  <nav class="navigation">
+    <div class="nav-button" *ngFor="let activity of activities; index as i" (click)="toggleActivity(activity, i)" [ngClass]="{'nav-started': isStarted(activity)}">
+      {{activity.name}}
+    </div>
+  </nav>
 
   <div class="charts">
     <div class="chart-content">
