@@ -6,6 +6,12 @@
     </div>
   </div>
 
+  <nav class="navigation">
+    <div class="nav-button" *ngFor="let activity of activities; index as i" (click)="toggleActivity(activity, i)" [ngClass]="{'nav-started': isStarted(activity)}">
+      {{activity.name}}
+    </div>
+  </nav>
+
   <div class="activity started-activity activity-overview" *ngIf="activeActivity != null" (click)="stopActivity(activeActivity)">
     <div class="activity-input">
       {{activeActivity.name}}
@@ -36,6 +42,13 @@
       <div class="chart-container">
         <canvas id="mean-pie-chart"></canvas>
       </div>
+    </div>
+  </div>
+
+  <div class="chart-content chart-content-time">
+    <div class="chart-title">Time by day</div>
+    <div class="chart-container chart-container-time">
+      <canvas id="time-chart"></canvas>
     </div>
   </div>
 

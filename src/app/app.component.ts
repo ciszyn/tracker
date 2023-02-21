@@ -5,6 +5,7 @@ import { ComponentCanDeactivate } from './guards/can-deactivate';
 import { Activity } from './models/activity';
 import { SavedActivity } from './models/saved-activity';
 import { TrackerService } from './services/tracker-service.service';
+import 'chartjs-adapter-moment';
 
 const counter = timer(0, 1000);
 
@@ -20,6 +21,7 @@ export class AppComponent implements ComponentCanDeactivate {
   public totalPieChart: any | null = null;
   public monthPieChart: any | null = null;
   public meanPieChart: any | null = null;
+  public timeChart: any | null = null;
   public colors: string[] = []
   public activeActivity: SavedActivity | null = null;
   public selectedMenu: number = -1;
@@ -40,6 +42,7 @@ export class AppComponent implements ComponentCanDeactivate {
       this.createPieChart("total")
       this.createPieChart("month")
       this.createPieChart("mean")
+      this.createTimeChart()
     })
 
 
@@ -141,13 +144,22 @@ export class AppComponent implements ComponentCanDeactivate {
     return Math.floor((new Date(activity.end).getTime() - new Date(activity.start).getTime()) / 1000)
   }
 
-  public getDurationByDay(activity: SavedActivity): Map<Date, number> {
-    var map = new Map<Date, number>();
-    activity.activities.forEach(a => {
-      var date = new Date(a.start.getFullYear(), a.start.getMonth(), a.start.getDay());
+  public getDurationByDay(activity: SavedActivity) {
+    var map = new Map<string, number>();
+    var result = <any[]>[]
+    activity?.activities?.forEach(a => {
+      var date = new Date(new Date(a.start).getFullYear(), new Date(a.start).getMonth(), new Date(a.start).getDate()).toISOString();
       map.set(date, (map.get(date) ?? 0) + this.getDuration(a))
     })
-    return map
+
+    console.log(map)
+
+    map.forEach((value, key) => result.push({
+      x: key,
+      y: value
+    }))
+
+    return result
   }
 
   public getLastWeekDuration(activity: SavedActivity) {
@@ -293,6 +305,83 @@ export class AppComponent implements ComponentCanDeactivate {
     if (type == "mean") {
       this.meanPieChart = chart
     }
+  }
+
+  public createTimeChart() {
+    this.timeChart?.destroy()
+
+    var data = {
+      labels: [1],
+      datasets: <any[]>[]
+    };
+
+    this.activities.forEach(activity => {
+      var durations = this.getDurationByDay(activity);
+      console.log(durations)
+
+      data.datasets.push({
+        label: activity.name,
+        data: durations
+      })
+    })
+
+    var chartElement: any = document.getElementById('time-chart');
+
+    this.timeChart = new Chart(chartElement, {
+      type: 'line',
+      data: data,
+      options: {
+        maintainAspectRatio: false,
+        parsing: {
+          xAxisKey: 'x',
+          yAxisKey: 'y',
+        },
+        scales: {
+          y: {
+            min: 0,
+            ticks: {
+              color: "#bbb",
+              font: {
+                size: 15
+              },
+              callback: value => this.secondsToTimeString(parseFloat(value.toString()))
+            }
+          },
+          x: {
+            type: 'time',
+            min: new Date().getTime() - 30 * 24 * 60 * 60 * 1000,
+            time: {
+              parser: "YYYY-MM-DDTHH:mm:ss",
+              unit: "day"
+            },
+            ticks: {
+              color: "#bbb",
+              font: {
+                size: 15
+              }
+            }
+          }
+        },
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (value) => this.secondsToTimeString(parseFloat(value.parsed.y.toString()))
+            }
+          },
+          legend: {
+            title: {
+              display: false,
+            },
+            labels: {
+              color: "#bbb",
+              font: {
+                size: 15
+              }
+            }
+          },
+        },
+      },
+    });
   }
 
   public selectMenu(i: number) {
