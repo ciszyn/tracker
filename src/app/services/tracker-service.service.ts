@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFireDatabase, AngularFireList, AngularFireObject } from '@angular/fire/compat/database';
-import { Observable, map, switchMap } from 'rxjs';
+import { Observable, map, switchMap, first } from 'rxjs';
 import { AuthService } from '../guards/auth.service';
 import { SavedActivity } from '../models/saved-activity';
 
@@ -22,11 +22,11 @@ export class TrackerService {
   }
 
   public setActivities(activities: SavedActivity[]): any {
-    this.activityRef.subscribe(ref => ref.update(activities))
+    this.activityRef.pipe(first()).subscribe(ref => ref.update(activities))
   }
 
   public deleteActivity(activities: SavedActivity[]) {
     // this.activityRef.subscribe(ref => ref.update(activities))
-    this.activityRef.subscribe(ref => ref.set(activities))
+    this.activityRef.pipe(first()).subscribe(ref => ref.set(activities))
   }
 }

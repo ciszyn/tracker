@@ -1,6 +1,6 @@
 import { Component, HostListener, OnDestroy, TemplateRef } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
-import { Observable, timer } from 'rxjs';
+import { Observable, Subscription, timer } from 'rxjs';
 import { ComponentCanDeactivate } from './guards/can-deactivate';
 import { Activity } from './models/activity';
 import { SavedActivity } from './models/saved-activity';
@@ -14,7 +14,7 @@ const counter = timer(0, 1000);
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent implements ComponentCanDeactivate {
+export class AppComponent implements ComponentCanDeactivate, OnDestroy {
   public activities: SavedActivity[] = [];
   public newActivity: SavedActivity = new SavedActivity("", []);
   public time: number = 0;
@@ -27,10 +27,14 @@ export class AppComponent implements ComponentCanDeactivate {
   public selectedMenu: number = -1;
   public openedDialog: number = -1;
 
+  public activitiesObservable: Subscription | null = null;
+  public counterObservable: Subscription| null = null;
+
+
   constructor(private trackerService: TrackerService) {
     Chart.register(...registerables)
 
-    trackerService.getActivities()?.subscribe(a => {
+    this.activitiesObservable = trackerService.getActivities()?.subscribe(a => {
       this.activities = a ?? []
 
       this.activities.forEach((activity, index) => {
@@ -46,13 +50,18 @@ export class AppComponent implements ComponentCanDeactivate {
     })
 
 
-    counter.subscribe(t => this.time += 0);
+    this.counterObservable = counter.subscribe(t => this.time += 0);
 
     for (var i = 0; i < 16; i++) {
       this.colors.push(this.getRandomColor())
     }
 
     addEventListener('beforeunload', (event) => { confirm("confirm") });
+  }
+
+  ngOnDestroy(): void {
+    this.activitiesObservable?.unsubscribe();
+    this.counterObservable?.unsubscribe();
   }
 
   @HostListener('window:beforeunload', ['$event'])

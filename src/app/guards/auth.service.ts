@@ -16,7 +16,7 @@ export class AuthService {
 
   login(): Promise<void> {
     return this.afAuth
-      .setPersistence(firebase.auth.Auth.Persistence.LOCAL)
+      .setPersistence(firebase.auth.Auth.Persistence.NONE)
       .then((res) =>
         this.afAuth.signInWithRedirect(new firebase.auth.GoogleAuthProvider())
       );
