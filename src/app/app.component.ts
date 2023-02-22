@@ -88,8 +88,6 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
   }
 
   public startActivity(activity: SavedActivity, i: number) {
-    console.log(this.activeActivity)
-
     if (activity.activities)
       activity.activities.push(new Activity(new Date(), null))
     else
@@ -160,8 +158,6 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
       var date = new Date(new Date(a.start).getFullYear(), new Date(a.start).getMonth(), new Date(a.start).getDate()).toISOString();
       map.set(date, (map.get(date) ?? 0) + this.getDuration(a))
     })
-
-    console.log(map)
 
     map.forEach((value, key) => result.push({
       x: key,
@@ -320,13 +316,11 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
     this.timeChart?.destroy()
 
     var data = {
-      labels: [1],
       datasets: <any[]>[]
     };
 
     this.activities.forEach(activity => {
       var durations = this.getDurationByDay(activity);
-      console.log(durations)
 
       data.datasets.push({
         label: activity.name,
@@ -394,7 +388,6 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
   }
 
   public selectMenu(i: number) {
-    console.log(i)
     if (this.selectedMenu === i) {
       this.selectedMenu = -1
       this.openedDialog = -1;
