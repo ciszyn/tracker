@@ -16,11 +16,14 @@ const counter = timer(0, 1000);
 })
 export class AppComponent implements ComponentCanDeactivate, OnDestroy {
   public activities: SavedActivity[] = [];
-  public newActivity: SavedActivity = new SavedActivity("", []);
+  public newActivity: SavedActivity = new SavedActivity("", [], []);
   public time: number = 0;
   public totalPieChart: any | null = null;
   public monthPieChart: any | null = null;
   public meanPieChart: any | null = null;
+  public tagTotalPieChart: any | null = null;
+  public tagMonthPieChart: any | null = null;
+  public tagMeanPieChart: any | null = null;
   public timeChart: any | null = null;
   public colors: string[] = []
   public activeActivity: SavedActivity | null = null;
@@ -80,7 +83,7 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
   public createNewActivity() {
     this.activities.push(this.newActivity);
     this.trackerService.setActivities(this.activities);
-    this.newActivity = new SavedActivity("", []);
+    this.newActivity = new SavedActivity("", [], []);
   }
 
   public updateActivities() {
@@ -241,6 +244,19 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
     return '#' + color + color + color
   }
 
+  public addNewTag(activity: SavedActivity) {
+    if (!activity.tags)
+      activity.tags = [];
+
+    activity.tags.push("");
+    console.log(this.activities);
+    this.trackerService.setActivities(this.activities);
+  }
+
+  public trackByIdx(index: number, obj: any): any {
+    return index;
+  }
+
   public createPieChart(type: string) {
 
     var durations: number[] = []
@@ -260,6 +276,21 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
       labels.push(a.name)
     });
 
+
+    var tagDurations: Map<string, number> = new Map<string, number>();
+
+    this.activities.forEach((a, i) => {
+      if (type == "total")
+        for (var tag of a.tags)
+          tagDurations.set(tag, (tagDurations.get(tag) ?? 0) + this.getTotalDuration(a))
+      if (type == "month")
+        for (var tag of a.tags)
+          tagDurations.set(tag, (tagDurations.get(tag) ?? 0) + this.getLastMonthDuration(a))
+      if (type == "mean")
+        for (var tag of a.tags)
+          tagDurations.set(tag, (tagDurations.get(tag) ?? 0) + this.getMeanDuration(a))
+    });
+
     var data = {
       labels: labels,
       datasets: [{
@@ -269,15 +300,19 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
 
     if (type == "total") {
       this.totalPieChart?.destroy();
+      this.tagTotalPieChart?.destroy();
     }
     if (type == "month") {
       this.monthPieChart?.destroy();
+      this.tagMonthPieChart?.destroy();
     }
     if (type == "mean") {
       this.meanPieChart?.destroy();
+      this.tagMeanPieChart?.destroy();
     }
 
     var element: any = document.getElementById(type + '-pie-chart');
+    var tagElement: any = document.getElementById(type + '-tag-pie-chart');
 
     var chart = new Chart(element, {
       type: 'pie',
@@ -301,14 +336,46 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
       }
     });
 
+    console.log(tagDurations);
+
+    var tagChart = new Chart(tagElement, {
+      type: 'pie',
+      data: {
+        labels: Array.from(tagDurations.keys()),
+        datasets: [{
+          data: Array.from(tagDurations.values()),
+        }]
+      },
+      options: {
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: (value) => this.secondsToTimeString(parseFloat(value.parsed.toString()))
+            }
+          },
+          legend: {
+            labels: {
+              color: "#bbb",
+              font: {
+                size: 15
+              }
+            }
+          },
+        }
+      }
+    });
+
     if (type == "total") {
       this.totalPieChart = chart
+      this.tagTotalPieChart = tagChart
     }
     if (type == "month") {
       this.monthPieChart = chart
+      this.tagMonthPieChart = tagChart
     }
     if (type == "mean") {
       this.meanPieChart = chart
+      this.tagMeanPieChart = tagChart
     }
   }
 

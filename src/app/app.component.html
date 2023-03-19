@@ -45,6 +45,29 @@
     </div>
   </div>
 
+  <div class="charts">
+    <div class="chart-content">
+      <div class="chart-title">Total Time</div>
+      <div class="chart-container">
+        <canvas id="total-tag-pie-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-content">
+      <div class="chart-title">Monthly Time</div>
+      <div class="chart-container">
+        <canvas id="month-tag-pie-chart"></canvas>
+      </div>
+    </div>
+
+    <div class="chart-content">
+      <div class="chart-title">Mean Time</div>
+      <div class="chart-container">
+        <canvas id="mean-tag-pie-chart"></canvas>
+      </div>
+    </div>
+  </div>
+
   <div class="chart-content chart-content-time">
     <div class="chart-title">Time by day</div>
     <div class="chart-container chart-container-time">
@@ -76,7 +99,7 @@
             <div class="dialog" *ngIf="openedDialog === 0">
               <h2 class="dialog-title">Delete Activity</h2>
               <div class="dialog-description">
-                <p>This action is non-reversible. Are You sure that You want to delete activity <b>{{activity.name}}</b>?</p>
+                <p>This action is non-reversible. Are you sure that you want to delete activity <b>{{activity.name}}</b>?</p>
               </div>
               <div class="dialog-buttons">
                 <button class="dialog-button" (click)="deleteActivity(activity, i); hideMenu()">Yes</button>
@@ -121,6 +144,16 @@
         </div>
       </div>
     </div>
+
+    <div class="tags">
+      <div class="tag" *ngFor="let tagString of activity.tags; let i = index; trackBy:trackByIdx">
+        <input [(ngModel)]="activity.tags[i]" class="tag-input" type="text" placeholder="tag" (change)="updateActivities()"/>
+      </div>
+      <div class="tag">
+        <button class="tag-button" (click)="addNewTag(activity)">add</button>
+      </div>
+    </div>
+
     <div class="activity-detail">
       <div class="cell">
         <div class="label">
