@@ -146,6 +146,7 @@
     </div>
 
     <div class="tags">
+      <span class="tags-title">Tags:</span>
       <div class="tag" *ngFor="let tagString of activity.tags; let i = index; trackBy:trackByIdx">
         <input [(ngModel)]="activity.tags[i]" class="tag-input" type="text" placeholder="tag" (change)="updateActivities()"/>
       </div>

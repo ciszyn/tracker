@@ -391,6 +391,8 @@
   display: flex;
   flex-direction: row;
   margin-top: 2rem;
+  align-items: center;
+  margin-left: 1rem;
 }
 
 .tag-input {
@@ -424,4 +426,9 @@
       cursor: pointer;
       background-color: #555;
   }
+}
+
+.tags-title {
+  font-size: 2rem;
+  margin-right: 2rem;
 }
