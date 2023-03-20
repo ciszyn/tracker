@@ -248,8 +248,7 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
     if (!activity.tags)
       activity.tags = [];
 
-    activity.tags.push("");
-    console.log(this.activities);
+    activity.tags.push("Tag");
     this.trackerService.setActivities(this.activities);
   }
 
@@ -281,13 +280,13 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
 
     this.activities.forEach((a, i) => {
       if (type == "total")
-        for (var tag of a.tags)
+        for (var tag of a.tags ?? [])
           tagDurations.set(tag, (tagDurations.get(tag) ?? 0) + this.getTotalDuration(a))
       if (type == "month")
-        for (var tag of a.tags)
+        for (var tag of a.tags ?? [])
           tagDurations.set(tag, (tagDurations.get(tag) ?? 0) + this.getLastMonthDuration(a))
       if (type == "mean")
-        for (var tag of a.tags)
+        for (var tag of a.tags ?? [])
           tagDurations.set(tag, (tagDurations.get(tag) ?? 0) + this.getMeanDuration(a))
     });
 
@@ -335,8 +334,6 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
         }
       }
     });
-
-    console.log(tagDurations);
 
     var tagChart = new Chart(tagElement, {
       type: 'pie',
@@ -475,5 +472,13 @@ export class AppComponent implements ComponentCanDeactivate, OnDestroy {
   public hideMenu() {
     this.selectedMenu = -1;
     this.openedDialog = -1;
+  }
+
+  public updateTagActivities(index: number, activity: SavedActivity) {
+    if (activity.tags[index] == "") {
+      activity.tags.splice(index, 1);
+    }
+
+    this.updateActivities();
   }
 }

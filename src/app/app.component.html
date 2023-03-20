@@ -81,7 +81,9 @@
 
       <div class="menu">
         <div class="menu-button" (click)="selectMenu(i)">
-          <div class="menu-icon"></div>
+          <svg class="svg-menu-icon" width="4rem" height="4rem" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none">
+            <path fill="#ddd" fill-rule="evenodd" d="M19 4a1 1 0 01-1 1H2a1 1 0 010-2h16a1 1 0 011 1zm0 6a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-1 7a1 1 0 100-2H2a1 1 0 100 2h16z"/>
+          </svg>
         </div>
 
         <div class="options" *ngIf="selectedMenu==i">
@@ -148,10 +150,14 @@
     <div class="tags">
       <span class="tags-title">Tags:</span>
       <div class="tag" *ngFor="let tagString of activity.tags; let i = index; trackBy:trackByIdx">
-        <input [(ngModel)]="activity.tags[i]" class="tag-input" type="text" placeholder="tag" (change)="updateActivities()"/>
+        <input [(ngModel)]="activity.tags[i]" class="tag-input" type="text" placeholder="tag" (change)="updateTagActivities(i, activity)"/>
       </div>
       <div class="tag">
-        <button class="tag-button" (click)="addNewTag(activity)">add</button>
+        <button class="tag-button" (click)="addNewTag(activity)">
+          <svg width="1.5rem" height="1.5rem" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path fill="#eee" fill-rule="evenodd" clip-rule="evenodd" d="M12 4C12.5523 4 13 4.44772 13 5V11H19C19.5523 11 20 11.4477 20 12C20 12.5523 19.5523 13 19 13H13V19C13 19.5523 12.5523 20 12 20C11.4477 20 11 19.5523 11 19V13H5C4.44772 13 4 12.5523 4 12C4 11.4477 4.44772 11 5 11H11V5C11 4.44772 11.4477 4 12 4Z"/>
+            </svg>
+        </button>
       </div>
     </div>
 
